@@ -53,8 +53,9 @@ DetectorSS::DetectorSS(int depth, int width, int lgn, int b, int c, int memory, 
     ss_.len = len;
     ss_.mask = mask;
     //init HH
-    ss_.key = new unsigned long[ss_.len]();
+    ss_.key = new unsigned long long[ss_.len]();
     ss_.indicator = new int[ss_.len]();
+	ss_.upperbound = new int[ss_.len]();
 }
 
 #else
@@ -146,7 +147,7 @@ void DetectorSS::Setbit(int n, int bucket,  unsigned char* bmp) {
 // For width <= 4
 void DetectorSS::Update(key_tp src, key_tp dst, val_tp weight) {
 
-    unsigned long edge = src;
+    unsigned long long edge = src;
     edge = (edge << 32) | dst;
     int tmplevel = 0;
     //Update sketch
@@ -156,12 +157,14 @@ void DetectorSS::Update(key_tp src, key_tp dst, val_tp weight) {
     int index = p & ss_.mask;
     if (ss_.key[index] == edge) {
         ss_.indicator[index]++;
+		ss_.upperbound[index]++;
         return;
     } else {
         ss_.indicator[index]--;
         if (ss_.indicator[index] < 0) {
             ss_.key[index] = edge;
             ss_.indicator[index] = 1;
+			ss_.upperbound[index] = 1;
         }
     }
 #endif
@@ -193,7 +196,7 @@ void DetectorSS::Update(key_tp src, key_tp dst, val_tp weight) {
         bucket = MurmurHash64A((unsigned char*)(&src), ss_.lgn/8, ss_.hash[i]);
         bucket = (bucket * (unsigned long)ss_.width) >> 32;
         if (ss_.level[i][bucket] < tmplevel) {
-            ss_.level[i][bucket] = tmplevel;
+            ss_.level[i][bucket] = tmplevel; 
             ss_.skey[i][bucket] = src;
         }
         Setbit(pos, bucket, ss_.counts[i]);
@@ -201,6 +204,37 @@ void DetectorSS::Update(key_tp src, key_tp dst, val_tp weight) {
 
 
 }
+
+int DetectorSS::getValue1(uint64_t edge){
+	unsigned long p = MurmurHash64A((unsigned char*)(&edge), ss_.lgn/8*2, ss_.hash[0]);
+    int index = p & ss_.mask;
+    return ss_.indicator[index];
+}
+
+int DetectorSS::getValue2(uint64_t edge){
+	unsigned long p = MurmurHash64A((unsigned char*)(&edge), ss_.lgn/8*2, ss_.hash[0]);
+    int index = p & ss_.mask;
+    return ss_.upperbound[index];
+}
+
+unsigned long long DetectorSS::getValue3(uint64_t edge){
+	unsigned long p = MurmurHash64A((unsigned char*)(&edge), ss_.lgn/8*2, ss_.hash[0]);
+    int index = p & ss_.mask;
+	return ss_.key[index];
+}
+
+unsigned long long DetectorSS::getValue4(int idx){
+	return ss_.key[idx];
+}
+
+unsigned long long DetectorSS::getValue5(int idx){
+	return ss_.upperbound[idx];
+}
+
+unsigned long long DetectorSS::getValue6(int idx){
+	return ss_.indicator[idx];
+}
+
 
 int DetectorSS::Estimate(int bucket, unsigned char* bmp){
   int offs = bucket * ss_.offsets[ss_.c];

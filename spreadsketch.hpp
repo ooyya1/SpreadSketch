@@ -64,8 +64,9 @@ class DetectorSS {
 
 #ifdef HH
         /**************** parameters for HH ******************/
-        unsigned long *key;
+        unsigned long long *key;
         int *indicator;
+		int *upperbound;
         int len;
         unsigned mask;
 #endif
@@ -98,13 +99,26 @@ public:
 
     key_tp** GetKey();
 
+	//add by xy
+	int getValue1(uint64_t edge);		
+
+	int getValue2(uint64_t edge);
+
+	unsigned long long getValue3(uint64_t edge);
+
+	unsigned long long getValue4(int idx);
+
+	unsigned long long getValue5(int idx);
+
+	unsigned long long getValue6(int idx);
+
     int** GetLevel();
 
-private:
+//private:
 
     //Sketch data structure
     CSS_type ss_;
-
+private:
     //SS to store the heavy hitter
     std::vector<std::pair<uint32_t, uint64_t> > heap_;
 

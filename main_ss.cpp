@@ -5,6 +5,7 @@
 #include "util.h"
 #include <fstream>
 #include <iomanip>
+#include <map>
 
 int main(int argc, char* argv[]) {
 
@@ -14,7 +15,7 @@ int main(int argc, char* argv[]) {
     // buffer size
     unsigned long long buf_size = 500000000;
     // Superspreader threshold
-    double thresh = 0.001;
+    double thresh = 0.0001;
     // SpreadSketch parameters
     int lgn = 32;
     int cmdepth = 4;
@@ -31,7 +32,7 @@ int main(int argc, char* argv[]) {
 
 #ifdef HH
     //number of filter units in HP-Filter
-    int len = 2048;
+    int len = 8192;
     unsigned mask = 0;
     if (len && (!(len & (len-1))) != 0) {
         mask = (unsigned)(len-1);
@@ -46,6 +47,7 @@ int main(int argc, char* argv[]) {
     double precision = 0, recall = 0, error = 0, throughput = 0, dtime = 0;
     double avgpre = 0, avgrec = 0, avgerr = 0, avgthr = 0, avgdet = 0;
     int epoch = 0;
+	std::map<unsigned long long, int> heavypair;
     for (std::string file; getline(tracefiles, file);) {
         epoch++;
         InputAdaptor* adaptor =  new InputAdaptor(file, buf_size);
@@ -59,6 +61,10 @@ int main(int argc, char* argv[]) {
         while(adaptor->GetNext(&t) == 1) {
             sum.insert(t);
             ground[t.src_ip].insert(t.dst_ip);
+			//add by xy
+			unsigned long long edge = t.src_ip;
+			edge = (edge << 32) | t.dst_ip;
+			heavypair[edge]++;
         }
         std::cout << "[Message] Finish Insert hash table" << std::endl;
 
@@ -94,7 +100,7 @@ int main(int argc, char* argv[]) {
         dtime = (double)(t2-t1)/1000000;
 
         // Calculate accuracy
-        int tp = 0, cnt = 0;;
+        int tp = 0, cnt = 0;
         for (auto it = ground.begin(); it != ground.end(); it++) {
             if (it->second.size() > threshold) {
                 cnt++;
@@ -107,6 +113,35 @@ int main(int argc, char* argv[]) {
                 }
             }
         }
+		//add by xy
+		std::map<unsigned long long, int> filter_res;
+		for(int i = 0; i < len; i++) {
+			uint64_t edge = sketch->getValue4(i);
+			int est = sketch->getValue5(i);
+			if(est > 10000)
+				filter_res[edge] = est;
+		}
+		int tp_count = 0, cnt_count = 0;
+		for(auto it = heavypair.begin(); it != heavypair.end(); it++) {
+			if(it->second > 10000) {
+				cnt_count ++;
+				for(auto res = filter_res.begin(); res != filter_res.end(); res++) {
+					if(res->first == it->first) {
+						tp_count++;
+					}
+				}
+				/*int value1 = sketch->getValue1(it->first);
+				int value2 = sketch->getValue2(it->first);
+				//int value3 = sketch->getValue3(it->first);
+				unsigned long long value3 = sketch->getValue3(it->first);
+				//if(value3) est_count++;
+        		std::cout << "ground: " << it->second << " indicator: " << value1 << " upperbound: " << value2 << " filter: " << filter_res[it->first] << std::endl;*/
+				/*if(it->first == value3)
+					std::cout << " yes" << std::endl;*/
+ 			}
+		}
+		std::cout << filter_res.size() << " tp: " << tp_count << " cnt: " << cnt_count << std::endl;
+		std::cout << "Heavy pair total count: " << cnt_count << " presicion: " << tp_count*1.0/filter_res.size() << " recall: " << tp_count*1.0/cnt_count << std::endl;
         std::cout << "[Message] Total " << cnt << " superspreaders, detect " << tp << std::endl;
         precision = tp*1.0/results.size();
         recall = tp*1.0/cnt;

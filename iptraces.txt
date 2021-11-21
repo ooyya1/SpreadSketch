@@ -1,2 +1,1 @@
-traces/trace1.pcap
-traces/trace2.pcap
+/home/xy/Desktop/trace/equinix-chicago.dirA.20160406-130000.UTC.anon.pcap
