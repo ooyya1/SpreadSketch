@@ -1,11 +1,17 @@
 #include "spreadsketch.hpp"
 #include "inputadaptor.hpp"
 #include <utility>
-#include "datatypes.hpp"
+//#include "datatypes.hpp"
 #include "util.h"
 #include <fstream>
 #include <iomanip>
 #include <map>
+
+int tuple_equal1(tuple_t a, tuple_t b) {
+    if(a.src_ip == b.src_ip && a.dst_ip == b.dst_ip && a.src_port == b.src_port && a.dst_port == b.dst_port && a.protocol == b.protocol)
+        return 1;
+    else return 0;
+}
 
 int main(int argc, char* argv[]) {
 
@@ -32,7 +38,7 @@ int main(int argc, char* argv[]) {
 
 #ifdef HH
     //number of filter units in HP-Filter
-    int len = 8192;
+    int len = 32768;
     unsigned mask = 0;
     if (len && (!(len & (len-1))) != 0) {
         mask = (unsigned)(len-1);
@@ -56,15 +62,19 @@ int main(int argc, char* argv[]) {
         // Get the ground truth
         mymap ground;
         edgeset sum;
-        edge_tp t;
+        tuple_t t;
+        std::map<tuple_t, int> flowsize;
         adaptor->Reset();
         while(adaptor->GetNext(&t) == 1) {
-            sum.insert(t);
+            edge_tp eg;
+            eg.src_ip = t.src_ip; eg.dst_ip = t.dst_ip;
+            sum.insert(eg);
             ground[t.src_ip].insert(t.dst_ip);
 			//add by xy
 			unsigned long long edge = t.src_ip;
 			edge = (edge << 32) | t.dst_ip;
 			heavypair[edge]++;
+            flowsize[t]++;
         }
         std::cout << "[Message] Finish Insert hash table" << std::endl;
 
@@ -85,7 +95,7 @@ int main(int argc, char* argv[]) {
         t1 = now_us();
         adaptor->Reset();
         while(adaptor->GetNext(&t) == 1) {
-            sketch->Update(t.src_ip, t.dst_ip, 1);
+            sketch->Update(t, 1);
         }
         t2 = now_us();
         throughput = datasize/(double)(t2-t1)*1000000;
@@ -101,13 +111,14 @@ int main(int argc, char* argv[]) {
 
         // Calculate accuracy
         int tp = 0, cnt = 0;
+        double err = 0;
         for (auto it = ground.begin(); it != ground.end(); it++) {
             if (it->second.size() > threshold) {
                 cnt++;
                 int truth = (int) it->second.size();
                 for (auto res = results.begin(); res != results.end(); res++) {
                     if (res->first == it->first) {
-                        error = abs((int)res->second - truth)*1.0/truth;
+                        error += abs((int)res->second - truth)*1.0/truth;
                         tp++;
                     }
                 }
@@ -115,33 +126,31 @@ int main(int argc, char* argv[]) {
         }
 		//add by xy
 		std::map<unsigned long long, int> filter_res;
-		for(int i = 0; i < len; i++) {
-			uint64_t edge = sketch->getValue4(i);
-			int est = sketch->getValue5(i);
-			if(est > 10000)
-				filter_res[edge] = est;
-		}
+        std::map<tuple_t, int> heavyflow;
+		// for(int i = 0; i < len; i++) {
+		// 	// uint64_t edge = sketch->getValue4(i);
+		// 	// int est = sketch->getValue5(i);
+		// 	// if(est > 10000)
+		// 	// 	filter_res[edge] = est;
+        //     tuple_t t = sketch->getValue4(i);
+		// 	int est = sketch->getValue7(i);
+		// 	if(est > 1000)
+		// 		heavyflow[t] = est;
+		// }
 		int tp_count = 0, cnt_count = 0;
-		for(auto it = heavypair.begin(); it != heavypair.end(); it++) {
-			if(it->second > 10000) {
-				cnt_count ++;
-				for(auto res = filter_res.begin(); res != filter_res.end(); res++) {
-					if(res->first == it->first) {
-						tp_count++;
-					}
-				}
-				/*int value1 = sketch->getValue1(it->first);
-				int value2 = sketch->getValue2(it->first);
-				//int value3 = sketch->getValue3(it->first);
-				unsigned long long value3 = sketch->getValue3(it->first);
-				//if(value3) est_count++;
-        		std::cout << "ground: " << it->second << " indicator: " << value1 << " upperbound: " << value2 << " filter: " << filter_res[it->first] << std::endl;*/
-				/*if(it->first == value3)
-					std::cout << " yes" << std::endl;*/
- 			}
-		}
-		std::cout << filter_res.size() << " tp: " << tp_count << " cnt: " << cnt_count << std::endl;
-		std::cout << "Heavy pair total count: " << cnt_count << " presicion: " << tp_count*1.0/filter_res.size() << " recall: " << tp_count*1.0/cnt_count << std::endl;
+		// for(auto it = flowsize.begin(); it != flowsize.end(); it++) {
+		// 	if(it->second > 1000) {
+		// 		cnt_count ++;
+		// 		for(auto res = heavyflow.begin(); res != heavyflow.end(); res++) {
+		// 			if(tuple_equal1(res->first, it->first)) {
+		// 				tp_count++;
+        //                 err += abs((double)it->second - res->second) / it->second;
+		// 			}
+		// 		}
+ 		// 	}
+		// }
+		// std::cout << filter_res.size() << " tp: " << tp_count << " cnt: " << cnt_count << std::endl;
+		// std::cout << "Heavy pair total count: " << cnt_count << " presicion: " << tp_count*1.0/heavyflow.size() << " recall: " << tp_count*1.0/cnt_count << " error: " << err/tp_count << std::endl;
         std::cout << "[Message] Total " << cnt << " superspreaders, detect " << tp << std::endl;
         precision = tp*1.0/results.size();
         recall = tp*1.0/cnt;

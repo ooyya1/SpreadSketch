@@ -40,9 +40,14 @@ InputAdaptor::InputAdaptor(std::string filename, uint64_t buffersize) {
         ip_hdr = (struct ip*)(rawpkt + eth_len);
         int srcip = ntohl(ip_hdr->ip_src.s_addr);
         int dstip = ntohl(ip_hdr->ip_dst.s_addr);
+        uint16_t src_port, dst_port;
+        uint8_t protocol = (uint8_t)ip_hdr->ip_p;
         if (p+sizeof(edge_tp) < data->databuffer + buffersize) {
             memcpy(p, &srcip, sizeof(uint32_t));
-            memcpy(p+sizeof(uint32_t), &dstip, sizeof(uint32_t));
+            memcpy(p+sizeof(uint8_t)*4, &dstip, sizeof(uint32_t));
+            memcpy(p+sizeof(uint8_t)*8, &src_port, sizeof(uint16_t));
+            memcpy(p+sizeof(uint8_t)*10, &dst_port, sizeof(uint16_t)); 
+            memcpy(p+sizeof(uint8_t)*12, &protocol, sizeof(uint8_t));
             p += sizeof(uint8_t)*8;
             data->cnt++;
         }  else break;
@@ -58,14 +63,17 @@ InputAdaptor::~InputAdaptor() {
    free(data);
 }
 
-int InputAdaptor::GetNext(edge_tp* t) {
+int InputAdaptor::GetNext(tuple_t* t) {
     if (data->cur > data->cnt) {
         return -1;
     }
     t->src_ip = *((uint32_t*)data->ptr);
     t->dst_ip = *((uint32_t*)(data->ptr+4));
+    t->src_port = *((uint16_t*)(data->ptr+8));
+    t->dst_port = *((uint16_t*)(data->ptr+10));
+    t->protocol = *((uint8_t*)(data->ptr+12));
     data->cur++;
-    data->ptr += 8;
+    data->ptr += 13;
     return 1;
 }
 

@@ -4,6 +4,7 @@
 #include <vector>
 #include <utility>
 #include "datatypes.hpp"
+#include "inputadaptor.hpp"
 #include <algorithm>
 #include <cstring>
 #include <cmath>
@@ -55,6 +56,9 @@ class DetectorSS {
         //level table
         int** level;
 
+        //min table
+        int **min;
+
         unsigned long * hash, *scale, *hardner;
 
         //# key bits
@@ -64,11 +68,15 @@ class DetectorSS {
 
 #ifdef HH
         /**************** parameters for HH ******************/
-        unsigned long long *key;
+        //unsigned long long *key;
+        tuple_t *key;
         int *indicator;
 		int *upperbound;
         int len;
         unsigned mask;
+        int *positive;
+        int *negative;
+        int lambda = 8;
 #endif
 
 
@@ -83,7 +91,9 @@ public:
 
     ~DetectorSS();
 
-    void Update(key_tp src, key_tp dst, val_tp weight);
+    //void Update(key_tp src, key_tp dst, val_tp weight);
+
+    void Update(tuple_t t, val_tp weight);
 
     int PointQuery(uint32_t key);
 
@@ -104,13 +114,17 @@ public:
 
 	int getValue2(uint64_t edge);
 
-	unsigned long long getValue3(uint64_t edge);
+	tuple_t getValue3(uint64_t edge);
 
-	unsigned long long getValue4(int idx);
+	tuple_t getValue4(int idx);
 
 	unsigned long long getValue5(int idx);
 
 	unsigned long long getValue6(int idx);
+
+    unsigned long long getValue7(int idx);
+
+    unsigned long long getValue8(uint64_t edge);
 
     int** GetLevel();
 

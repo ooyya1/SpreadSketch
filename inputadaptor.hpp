@@ -22,7 +22,7 @@ class InputAdaptor {
 
         ~InputAdaptor();
 
-        int GetNext(edge_tp* t);
+        int GetNext(tuple_t* t);
 
         void Reset();
 

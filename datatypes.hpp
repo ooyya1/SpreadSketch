@@ -16,6 +16,17 @@ typedef struct edge_t_s {
     uint32_t dst_ip;
 } edge_tp;
 
+typedef struct __attribute__ ((__packed__)) Tuple {
+    uint32_t src_ip;
+    uint32_t dst_ip;
+    uint16_t src_port;
+    uint16_t dst_port;
+    uint8_t protocol;
+	bool operator <(const Tuple& other) const {
+        return std::tie(src_ip,dst_ip,src_port,dst_port,protocol) < std::tie(other.src_ip,other.dst_ip,other.src_port,other.dst_port,other.protocol);
+	}
+} tuple_t;
+
 
 /**
  * Object for hash

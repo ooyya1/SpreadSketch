@@ -1,6 +1,17 @@
 #include "spreadsketch.hpp"
 
 #ifdef HH
+
+int tuple_equal(tuple_t a, tuple_t b) {
+    if(a.src_ip == b.src_ip && a.dst_ip == b.dst_ip && a.src_port == b.src_port && a.dst_port == b.dst_port && a.protocol == b.protocol)
+        return 1;
+    else return 0;
+}
+int tuple_empty(tuple_t a) {
+    if(a.src_ip == 0 && a.dst_ip == 0 && a.src_port == 0 && a.dst_port == 0 && a.protocol == 0)
+        return 1;
+    else return 0;
+}
 DetectorSS::DetectorSS(int depth, int width, int lgn, int b, int c, int memory, int len, unsigned mask) {
     ss_.depth = depth;
     ss_.width = width;
@@ -40,22 +51,31 @@ DetectorSS::DetectorSS(int depth, int width, int lgn, int b, int c, int memory, 
     //init SSketch
     ss_.skey = new key_tp*[depth];
     ss_.level = new int*[depth];
+    ss_.min = new int*[depth];
     for (int i = 0; i < depth; i++) {
         ss_.skey[i] = new key_tp[width]();
         ss_.level[i] = new int[width]();
+        ss_.min[i] = new int[width]();
     }
-    ss_.hash = new unsigned long[depth];
+    for (int i = 0; i < depth; i++) {
+        for (int j = 0; j < width; j++) {
+            ss_.min[i][j] = INT32_MAX;
+        }
+    }
+    ss_.hash = new unsigned long[depth + 1];
     char name[] = "DetectorSS";
     unsigned long seed = AwareHash((unsigned char*)name, strlen(name), 13091204281, 228204732751, 6620830889);
-    for (int i = 0; i < depth; i++) {
+    for (int i = 0; i < depth + 1; i++) {
         ss_.hash[i] = GenHashSeed(seed++);
     }
     ss_.len = len;
     ss_.mask = mask;
     //init HH
-    ss_.key = new unsigned long long[ss_.len]();
+    ss_.key = new tuple_t[ss_.len]();
     ss_.indicator = new int[ss_.len]();
 	ss_.upperbound = new int[ss_.len]();
+    ss_.positive = new int[ss_.len]();
+	ss_.negative = new int[ss_.len]();
 }
 
 #else
@@ -123,8 +143,11 @@ DetectorSS::~DetectorSS() {
     delete [] ss_.skey;
     delete [] ss_.level;
 #ifdef HH
+    delete [] ss_.min;
     delete [] ss_.key;
     delete [] ss_.indicator;
+    delete [] ss_.positive;
+    delete [] ss_.negative;
 #endif
 }
 
@@ -145,32 +168,48 @@ void DetectorSS::Setbit(int n, int bucket,  unsigned char* bmp) {
 
 
 // For width <= 4
-void DetectorSS::Update(key_tp src, key_tp dst, val_tp weight) {
+//void DetectorSS::Update(key_tp src, key_tp dst, val_tp weight) {
+void DetectorSS::Update(tuple_t t, val_tp weight) {
 
-    unsigned long long edge = src;
-    edge = (edge << 32) | dst;
+    unsigned long long edge = t.src_ip;
+    edge = (edge << 32) | t.dst_ip;
     int tmplevel = 0;
     //Update sketch
     unsigned long p = MurmurHash64A((unsigned char*)(&edge), ss_.lgn/8*2, ss_.hash[0]);
 #ifdef HH
     //check if HH
-    int index = p & ss_.mask;
-    if (ss_.key[index] == edge) {
-        ss_.indicator[index]++;
-		ss_.upperbound[index]++;
-        return;
-    } else {
-        ss_.indicator[index]--;
-        if (ss_.indicator[index] < 0) {
-            ss_.key[index] = edge;
-            ss_.indicator[index] = 1;
-			ss_.upperbound[index] = 1;
-        }
-    }
+    // int index = p & ss_.mask;
+    // if (tuple_equal(ss_.key[index], t)) {
+    //     // ss_.indicator[index]++;
+	// 	// ss_.upperbound[index]++;
+    //     ss_.positive[index] ++;
+    //     return;
+    // }
+    // else if (tuple_empty(ss_.key[index])) {
+    //     ss_.key[index] = t;
+    //     ss_.positive[index] = 1;
+    //     ss_.negative[index] = 0;
+    // } 
+    // else {
+    //     // ss_.indicator[index]--;
+    //     // if (ss_.indicator[index] < 0) {
+    //     //     ss_.key[index] = t;
+    //     //     ss_.indicator[index] = 1;
+	// 	// 	ss_.upperbound[index] = 1;
+    //     // }
+    //     ss_.negative[index] ++;
+    //     if(ss_.negative[index] / ss_.positive[index] >= ss_.lambda) {
+    //         ss_.key[index] = t;
+    //         ss_.positive[index] = 1;
+    //         ss_.negative[index] = 1;
+    //     }
+    // }
 #endif
+    //int currentMin = MurmurHash64A((unsigned char*)(&edge), ss_.lgn/8*2, ss_.hash[ss_.depth + 1]);
+    int currentMin = p;
     tmplevel = loghash(p);
     unsigned bucket = 0;
-    uint32_t key[3] = {src, src, src};
+    uint32_t key[3] = {t.src_ip, t.src_ip, t.src_ip};
     uint32_t hashval[4] = {0};
     MurmurHash3_x64_128 ( (unsigned char*)key, 12, ss_.hash[0], (unsigned char*)hashval);
     int pos = 0;
@@ -184,21 +223,29 @@ void DetectorSS::Update(key_tp src, key_tp dst, val_tp weight) {
 
     for (int i = 0; i < ss_.tdepth; i++) {
         bucket = (hashval[i] * (unsigned long)ss_.width) >> 32;
-        if (ss_.level[i][bucket] < tmplevel) {
-            ss_.level[i][bucket] = tmplevel;
-            ss_.skey[i][bucket] = src;
+        if (ss_.level[i][bucket] > currentMin) {
+            ss_.level[i][bucket] = currentMin;
+            ss_.skey[i][bucket] = t.src_ip;
         }
+        // if (ss_.level[i][bucket] < tmplevel) {
+        //     ss_.level[i][bucket] = tmplevel;
+        //     ss_.skey[i][bucket] = t.src_ip;
+        // }
         //Update distinct counter
         Setbit(pos, bucket, ss_.counts[i]);
     }
 
     for (int i = 4; i < ss_.depth; i++) {
-        bucket = MurmurHash64A((unsigned char*)(&src), ss_.lgn/8, ss_.hash[i]);
+        bucket = MurmurHash64A((unsigned char*)(&t.src_ip), ss_.lgn/8, ss_.hash[i]);
         bucket = (bucket * (unsigned long)ss_.width) >> 32;
-        if (ss_.level[i][bucket] < tmplevel) {
-            ss_.level[i][bucket] = tmplevel; 
-            ss_.skey[i][bucket] = src;
+        if (ss_.level[i][bucket] > currentMin) {
+            ss_.level[i][bucket] = currentMin;
+            ss_.skey[i][bucket] = t.src_ip;
         }
+        // if (ss_.level[i][bucket] < tmplevel) {
+        //     ss_.level[i][bucket] = tmplevel; 
+        //     ss_.skey[i][bucket] = t.src_ip;
+        // }
         Setbit(pos, bucket, ss_.counts[i]);
     }
 
@@ -217,13 +264,13 @@ int DetectorSS::getValue2(uint64_t edge){
     return ss_.upperbound[index];
 }
 
-unsigned long long DetectorSS::getValue3(uint64_t edge){
+tuple_t DetectorSS::getValue3(uint64_t edge){
 	unsigned long p = MurmurHash64A((unsigned char*)(&edge), ss_.lgn/8*2, ss_.hash[0]);
     int index = p & ss_.mask;
 	return ss_.key[index];
 }
 
-unsigned long long DetectorSS::getValue4(int idx){
+tuple_t DetectorSS::getValue4(int idx){
 	return ss_.key[idx];
 }
 
@@ -235,6 +282,15 @@ unsigned long long DetectorSS::getValue6(int idx){
 	return ss_.indicator[idx];
 }
 
+unsigned long long DetectorSS::getValue7(int idx){
+    return ss_.positive[idx];
+}
+
+unsigned long long DetectorSS::getValue8(uint64_t edge){
+	unsigned long p = MurmurHash64A((unsigned char*)(&edge), ss_.lgn/8*2, ss_.hash[0]);
+    int index = p & ss_.mask;
+	return ss_.positive[index];
+}
 
 int DetectorSS::Estimate(int bucket, unsigned char* bmp){
   int offs = bucket * ss_.offsets[ss_.c];
