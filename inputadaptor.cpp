@@ -48,7 +48,7 @@ InputAdaptor::InputAdaptor(std::string filename, uint64_t buffersize) {
             memcpy(p+sizeof(uint8_t)*8, &src_port, sizeof(uint16_t));
             memcpy(p+sizeof(uint8_t)*10, &dst_port, sizeof(uint16_t)); 
             memcpy(p+sizeof(uint8_t)*12, &protocol, sizeof(uint8_t));
-            p += sizeof(uint8_t)*8;
+            p += sizeof(uint8_t)*13;
             data->cnt++;
         }  else break;
     }

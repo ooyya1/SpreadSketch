@@ -11,6 +11,8 @@
 #include <iostream>
 #include <unordered_set>
 #include <fstream>
+#include <map>
+#include "virtualfilter.hpp"
 extern "C"
 {
 #include "hash.h"
@@ -91,13 +93,15 @@ public:
 
     ~DetectorSS();
 
-    //void Update(key_tp src, key_tp dst, val_tp weight);
+    void Update(key_tp src, key_tp dst, val_tp weight);
 
-    void Update(tuple_t t, val_tp weight);
+    //void Update(tuple_t t, val_tp weight);
 
     int PointQuery(uint32_t key);
 
     int PointQueryMerge(uint32_t key);
+
+    int PointQueryMerge1(uint32_t key);
 
     void Query(val_tp thresh, std::vector<std::pair<key_tp, val_tp> > &results);
 
@@ -109,24 +113,10 @@ public:
 
     key_tp** GetKey();
 
-	//add by xy
-	int getValue1(uint64_t edge);		
-
-	int getValue2(uint64_t edge);
-
-	tuple_t getValue3(uint64_t edge);
-
-	tuple_t getValue4(int idx);
-
-	unsigned long long getValue5(int idx);
-
-	unsigned long long getValue6(int idx);
-
-    unsigned long long getValue7(int idx);
-
-    unsigned long long getValue8(uint64_t edge);
-
     int** GetLevel();
+
+	//add by xy
+	std::map<int, int> basemap;
 
 //private:
 
@@ -134,6 +124,11 @@ public:
     CSS_type ss_;
 private:
     //SS to store the heavy hitter
+
+    //double sample_rate = 0.01;
+
+    //VF * vf = new VF(1048576, this->sample_rate);
+
     std::vector<std::pair<uint32_t, uint64_t> > heap_;
 
     int loghash(unsigned long p);
@@ -141,6 +136,8 @@ private:
     void Setbit(int n, int bucket,  unsigned char* bmp);
 
     int Estimate(int bucket, unsigned char* bmp);
+
+    int Estimate1(int bucket, unsigned char* bmp);
 
     void Copybmp(unsigned char* dst, unsigned char* src, int start, int len);
 

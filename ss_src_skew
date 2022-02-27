@@ -1,0 +1,224 @@
+Memory: 1.67772e+07 width: 8774
+[Message] Read 29922873 items
+Zipf skew = 0
+ top 1000 accu=0.00306411
+1. Finish construct zipf sequence
+2.1 Finish sort pcap data
+test=30677653	 total_pkt=30677653	 threshold=306.777
+2.2 Finish reset pcap frequency according to the zipf sequence
+2.3 Finish construct shuffl data
+3 Finish construct ground truth
+4. Finish updating sketch
+[Message] Total 0 superspreaders, detect 0
+Detector            skewness            Precision           Recall              Error               Throughput          DTime               
+SS                  0                   0                   -nan                -nan                1.71693e+07         0.0440094           
+Memory: 1.67772e+07 width: 8774
+[Message] Read 29922873 items
+Zipf skew = 0.1
+ top 1000 accu=0.00546262
+1. Finish construct zipf sequence
+2.1 Finish sort pcap data
+test=30588079	 total_pkt=30588079	 threshold=305.881
+2.2 Finish reset pcap frequency according to the zipf sequence
+2.3 Finish construct shuffl data
+3 Finish construct ground truth
+4. Finish updating sketch
+[Message] Total 0 superspreaders, detect 0
+Detector            skewness            Precision           Recall              Error               Throughput          DTime               
+SS                  0.1                 0                   -nan                -nan                1.74766e+07         0.0427364           
+Memory: 1.67772e+07 width: 8774
+[Message] Read 29922873 items
+Zipf skew = 0.2
+ top 1000 accu=0.00973219
+1. Finish construct zipf sequence
+2.1 Finish sort pcap data
+test=30587223	 total_pkt=30587223	 threshold=305.872
+2.2 Finish reset pcap frequency according to the zipf sequence
+2.3 Finish construct shuffl data
+3 Finish construct ground truth
+4. Finish updating sketch
+[Message] Total 296 superspreaders, detect 61
+Detector            skewness            Precision           Recall              Error               Throughput          DTime               
+SS                  0.2                 0.00335792          0.206081            4.83586             1.32913e+07         0.0445158           
+Memory: 1.67772e+07 width: 8774
+[Message] Read 29922873 items
+Zipf skew = 0.3
+ top 1000 accu=0.0173146
+1. Finish construct zipf sequence
+2.1 Finish sort pcap data
+test=30589065	 total_pkt=30589065	 threshold=305.891
+2.2 Finish reset pcap frequency according to the zipf sequence
+2.3 Finish construct shuffl data
+3 Finish construct ground truth
+4. Finish updating sketch
+[Message] Total 1960 superspreaders, detect 443
+Detector            skewness            Precision           Recall              Error               Throughput          DTime               
+SS                  0.3                 0.0241614           0.22602             4.48829             1.51162e+07         0.0453505           
+Memory: 1.67772e+07 width: 8774
+[Message] Read 29922873 items
+Zipf skew = 0.4
+ top 1000 accu=0.0307148
+1. Finish construct zipf sequence
+2.1 Finish sort pcap data
+test=30587398	 total_pkt=30587398	 threshold=305.874
+2.2 Finish reset pcap frequency according to the zipf sequence
+2.3 Finish construct shuffl data
+3 Finish construct ground truth
+4. Finish updating sketch
+[Message] Total 4792 superspreaders, detect 1246
+Detector            skewness            Precision           Recall              Error               Throughput          DTime               
+SS                  0.4                 0.0681731           0.260017            3.91875             1.78446e+07         0.0436858           
+Memory: 1.67772e+07 width: 8774
+[Message] Read 29922873 items
+Zipf skew = 0.5
+ top 1000 accu=0.0541593
+1. Finish construct zipf sequence
+2.1 Finish sort pcap data
+test=30588157	 total_pkt=30588157	 threshold=305.882
+2.2 Finish reset pcap frequency according to the zipf sequence
+2.3 Finish construct shuffl data
+3 Finish construct ground truth
+4. Finish updating sketch
+[Message] Total 7755 superspreaders, detect 2179
+Detector            skewness            Precision           Recall              Error               Throughput          DTime               
+SS                  0.5                 0.119594            0.28098             3.28749             1.73492e+07         0.0435631           
+Memory: 1.67772e+07 width: 8774
+[Message] Read 29922873 items
+Zipf skew = 0.6
+ top 1000 accu=0.094359
+1. Finish construct zipf sequence
+2.1 Finish sort pcap data
+test=30588415	 total_pkt=30588415	 threshold=305.884
+2.2 Finish reset pcap frequency according to the zipf sequence
+2.3 Finish construct shuffl data
+3 Finish construct ground truth
+4. Finish updating sketch
+[Message] Total 10032 superspreaders, detect 3165
+Detector            skewness            Precision           Recall              Error               Throughput          DTime               
+SS                  0.6                 0.17392             0.31549             2.76161             1.41981e+07         0.0402899           
+Memory: 1.67772e+07 width: 8774
+[Message] Read 29922873 items
+Zipf skew = 0.7
+ top 1000 accu=0.160665
+1. Finish construct zipf sequence
+2.1 Finish sort pcap data
+test=30588044	 total_pkt=30588044	 threshold=305.88
+2.2 Finish reset pcap frequency according to the zipf sequence
+2.3 Finish construct shuffl data
+3 Finish construct ground truth
+4. Finish updating sketch
+[Message] Total 11156 superspreaders, detect 3904
+Detector            skewness            Precision           Recall              Error               Throughput          DTime               
+SS                  0.7                 0.213812            0.349946            2.11841             1.73846e+07         0.0435374           
+Memory: 1.67772e+07 width: 8774
+[Message] Read 29922873 items
+Zipf skew = 0.8
+ top 1000 accu=0.262614
+1. Finish construct zipf sequence
+2.1 Finish sort pcap data
+test=30587801	 total_pkt=30587801	 threshold=305.878
+2.2 Finish reset pcap frequency according to the zipf sequence
+2.3 Finish construct shuffl data
+3 Finish construct ground truth
+4. Finish updating sketch
+[Message] Total 10963 superspreaders, detect 4657
+Detector            skewness            Precision           Recall              Error               Throughput          DTime               
+SS                  0.8                 0.254648            0.424792            1.58091             1.6519e+07          0.0432702           
+Memory: 1.67772e+07 width: 8774
+[Message] Read 29922873 items
+Zipf skew = 0.9
+ top 1000 accu=0.402224
+1. Finish construct zipf sequence
+2.1 Finish sort pcap data
+test=30588221	 total_pkt=30588221	 threshold=305.882
+2.2 Finish reset pcap frequency according to the zipf sequence
+2.3 Finish construct shuffl data
+3 Finish construct ground truth
+4. Finish updating sketch
+[Message] Total 9609 superspreaders, detect 4872
+Detector            skewness            Precision           Recall              Error               Throughput          DTime               
+SS                  0.9                 0.267135            0.507025            0.965997            1.6596e+07          0.0445464           
+Memory: 1.67772e+07 width: 8774
+[Message] Read 29922873 items
+Zipf skew = 1
+ top 1000 accu=0.563963
+1. Finish construct zipf sequence
+2.1 Finish sort pcap data
+test=30589884	 total_pkt=30589884	 threshold=305.899
+2.2 Finish reset pcap frequency according to the zipf sequence
+2.3 Finish construct shuffl data
+3 Finish construct ground truth
+4. Finish updating sketch
+[Message] Total 7571 superspreaders, detect 4709
+Detector            skewness            Precision           Recall              Error               Throughput          DTime               
+SS                  1                   0.271553            0.621979            0.51342             1.65383e+07         0.0451848           
+Memory: 1.67772e+07 width: 8774
+[Message] Read 29922873 items
+Zipf skew = 1.1
+ top 1000 accu=0.716768
+1. Finish construct zipf sequence
+2.1 Finish sort pcap data
+test=30585036	 total_pkt=30585036	 threshold=305.85
+2.2 Finish reset pcap frequency according to the zipf sequence
+2.3 Finish construct shuffl data
+3 Finish construct ground truth
+4. Finish updating sketch
+[Message] Total 5466 superspreaders, detect 4119
+Detector            skewness            Precision           Recall              Error               Throughput          DTime               
+SS                  1.1                 0.382132            0.753568            0.287424            1.76994e+07         0.0490508           
+Memory: 1.67772e+07 width: 8774
+[Message] Read 29922873 items
+Zipf skew = 1.2
+ top 1000 accu=0.834296
+1. Finish construct zipf sequence
+2.1 Finish sort pcap data
+test=30581626	 total_pkt=30581626	 threshold=305.816
+2.2 Finish reset pcap frequency according to the zipf sequence
+2.3 Finish construct shuffl data
+3 Finish construct ground truth
+4. Finish updating sketch
+[Message] Total 3732 superspreaders, detect 3267
+Detector            skewness            Precision           Recall              Error               Throughput          DTime               
+SS                  1.2                 0.674025            0.875402            0.163876            1.83223e+07         0.0415587           
+Memory: 1.67772e+07 width: 8774
+[Message] Read 29922873 items
+Zipf skew = 1.3
+ top 1000 accu=0.910406
+1. Finish construct zipf sequence
+2.1 Finish sort pcap data
+test=30694823	 total_pkt=30694823	 threshold=306.948
+2.2 Finish reset pcap frequency according to the zipf sequence
+2.3 Finish construct shuffl data
+3 Finish construct ground truth
+4. Finish updating sketch
+[Message] Total 2486 superspreaders, detect 2341
+Detector            skewness            Precision           Recall              Error               Throughput          DTime               
+SS                  1.3                 0.882397            0.941673            0.125076            1.92779e+07         0.0328699           
+Memory: 1.67772e+07 width: 8774
+[Message] Read 29922873 items
+Zipf skew = 1.4
+ top 1000 accu=0.954002
+1. Finish construct zipf sequence
+2.1 Finish sort pcap data
+test=30839532	 total_pkt=30839532	 threshold=308.395
+2.2 Finish reset pcap frequency according to the zipf sequence
+2.3 Finish construct shuffl data
+3 Finish construct ground truth
+4. Finish updating sketch
+[Message] Total 1659 superspreaders, detect 1626
+Detector            skewness            Precision           Recall              Error               Throughput          DTime               
+SS                  1.4                 0.942609            0.980108            0.122286            1.92748e+07         0.0261387           
+Memory: 1.67772e+07 width: 8774
+[Message] Read 29922873 items
+Zipf skew = 1.5
+ top 1000 accu=0.977106
+1. Finish construct zipf sequence
+2.1 Finish sort pcap data
+test=30940261	 total_pkt=30940261	 threshold=309.403
+2.2 Finish reset pcap frequency according to the zipf sequence
+2.3 Finish construct shuffl data
+3 Finish construct ground truth
+4. Finish updating sketch
+[Message] Total 1130 superspreaders, detect 1108
+Detector            skewness            Precision           Recall              Error               Throughput          DTime               
+SS                  1.5                 0.967686            0.980531            0.133722            1.89288e+07         0.0262801           
